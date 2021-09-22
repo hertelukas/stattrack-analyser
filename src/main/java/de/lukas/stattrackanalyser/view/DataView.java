@@ -33,7 +33,7 @@ public class DataView extends HBox {
 
     private static final String DATE = "Date";
     private static final LocalDateTime EPOCH_START = LocalDateTime.parse("1970-01-01T00:00:00.0");
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE;
 
     private ChoiceBox<String> xChoiceBox;
     private ChoiceBox<String> yChoiceBox;
