@@ -1,5 +1,6 @@
 package de.lukas.stattrackanalyser.view;
 
+import de.lukas.stattrackanalyser.StatTrackApplication;
 import de.lukas.stattrackanalyser.viewModel.MainViewModel;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -17,6 +18,7 @@ public class MainView extends BorderPane {
     }
 
     private void initialize() {
+        this.getStylesheets().add(StatTrackApplication.MAIN_STYLESHEET);
         this.setTop(generateMenuBar());
     }
 

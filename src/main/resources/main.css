@@ -1,0 +1,37 @@
+.button {
+    -fx-background-color: white;
+    -fx-font-family: 'Raleway Medium', sans-serif;
+}
+
+.button:hover {
+    -fx-background-color: #bbbbbb;
+    -fx-font-size: 1.1em;
+}
+
+.button:pressed {
+    -fx-background-color: #888888;
+}
+
+.choice-box {
+    -fx-background-color: white;
+    -fx-font-family: 'Raleway Medium', sans-serif;
+}
+
+.label {
+    -fx-font-family: 'Raleway Medium', sans-serif;
+}
+
+.h1 {
+    -fx-font-family: "Raleway Bold";
+    -fx-font-size: 35px;
+}
+
+/*Charts*/
+
+.default-color0.chart-series-line { -fx-stroke: #28AFB0; }
+.default-color1.chart-series-line { -fx-stroke: #9191E9; }
+.default-color2.chart-series-line { -fx-stroke: #30343F; }
+
+.default-color0.chart-line-symbol { -fx-background-color: #28AFB0, white; }
+.default-color1.chart-line-symbol { -fx-background-color: #9191E9, white; }
+.default-color2.chart-line-symbol { -fx-background-color: #30343F, white; }

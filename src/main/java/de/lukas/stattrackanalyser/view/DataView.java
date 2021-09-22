@@ -1,10 +1,12 @@
 package de.lukas.stattrackanalyser.view;
 
+import de.lukas.stattrackanalyser.StatTrackApplication;
 import de.lukas.stattrackanalyser.model.ChartType;
 import de.lukas.stattrackanalyser.model.DataType;
 import de.lukas.stattrackanalyser.model.Entry;
 import de.lukas.stattrackanalyser.model.JsonHolder;
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.ChoiceBox;
@@ -37,14 +39,24 @@ public class DataView extends HBox {
     private ChoiceBox<String> yChoiceBox;
 
     public DataView(JsonHolder jsonHolder) {
+        this.getStylesheets().add(StatTrackApplication.MAIN_STYLESHEET);
         this.jsonHolder = jsonHolder;
 
         initialize();
     }
 
     private void initialize() {
-        VBox menuHolder = new VBox();
 
+        this.setPadding(new Insets(10));
+
+        Label title = new Label("Setup");
+        title.getStyleClass().add("h1");
+
+        VBox menuHolder = new VBox();
+        menuHolder.setSpacing(20);
+
+        VBox chartTypeBox = new VBox();
+        chartTypeBox.setSpacing(5);
         Label chartTypeLabel = new Label("Chart type");
         ChoiceBox<ChartType> chartTypeChoiceBox = new ChoiceBox<>(FXCollections.observableList(Arrays.stream(ChartType.values()).toList()));
         chartTypeChoiceBox.setValue(chartType);
@@ -52,25 +64,33 @@ public class DataView extends HBox {
             chartType = chartTypeChoiceBox.getValue();
             updateChoiceBoxes();
         });
+        chartTypeBox.getChildren().addAll(chartTypeLabel, chartTypeChoiceBox);
 
+        VBox xAxisBox = new VBox();
+        xAxisBox.setSpacing(5);
         Label xAxisLabel = new Label("x-Axis");
         xChoiceBox = new ChoiceBox<>();
         xChoiceBox.setOnAction(event -> {
             xAxisKey = xChoiceBox.getValue();
             updateChart();
         });
+        xAxisBox.getChildren().addAll(xAxisLabel, xChoiceBox);
 
+
+        VBox yAxisBox = new VBox();
+        yAxisBox.setSpacing(5);
         Label yAxisLabel = new Label("y-Axis");
         yChoiceBox = new ChoiceBox<>();
         yChoiceBox.setOnAction(event -> {
             yAxisKey = yChoiceBox.getValue();
             updateChart();
         });
+        yAxisBox.getChildren().addAll(yAxisLabel, yChoiceBox);
 
         updateChoiceBoxes();
 
 
-        menuHolder.getChildren().addAll(chartTypeLabel, chartTypeChoiceBox, xAxisLabel, xChoiceBox, yAxisLabel, yChoiceBox);
+        menuHolder.getChildren().addAll(title, chartTypeBox, xAxisBox, yAxisBox);
 
         this.getChildren().add(0, menuHolder);
     }
@@ -132,10 +152,10 @@ public class DataView extends HBox {
         NumberAxis yAxis = new NumberAxis();
 
         xAxis.setLabel(xAxisKey);
-        yAxis.setLabel(yAxisKey);
 
         // Handle dates
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        series.setName(yAxisKey);
 
         List<Number> xAxisData = new ArrayList<>();
         List<Number> yAxisData = new ArrayList<>();

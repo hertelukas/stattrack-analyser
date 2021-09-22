@@ -13,6 +13,6 @@ public class BottomStatsViewModel {
     }
 
     public StringProperty amountProperty() {
-        return new SimpleStringProperty(String.valueOf(jsonHolder.getAmountOfEntries()));
+        return new SimpleStringProperty(jsonHolder.getAmountOfEntries() + " Entries");
     }
 }
