@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+// TODO: 9/22/21 Add option to enable/disable force 0 
 public class DataView extends HBox {
     private final JsonHolder jsonHolder;
     private String xAxisKey;
