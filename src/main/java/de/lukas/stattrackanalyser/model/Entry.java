@@ -15,6 +15,14 @@ public class Entry {
         this.fields = fields;
     }
 
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public List<Field> getFields() {
+        return fields;
+    }
+
     public static class Field {
         private final DataType dataType;
         private final String key;
@@ -26,6 +34,10 @@ public class Entry {
 
         public DataType getDataType() {
             return dataType;
+        }
+
+        public String getKey() {
+            return key;
         }
     }
 

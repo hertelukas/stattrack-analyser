@@ -10,7 +10,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 
 public class JsonHolder {
 
@@ -31,6 +34,38 @@ public class JsonHolder {
 
     public int getAmountOfEntries() {
         return entries.size();
+    }
+
+    public Map<LocalDateTime, Entry.Field> getFieldsByPredicate(Predicate<Entry.Field> predicate) {
+        Map<LocalDateTime, Entry.Field> result = new HashMap<>();
+
+        // Iterate through all entries
+        for (Entry entry : entries) {
+            for (Entry.Field field : entry.getFields()) {
+                // Check whether a field matches the given predicate
+                if (predicate.test(field)) {
+                    result.put(entry.getDate(), field);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public Map<LocalDateTime, Entry.Field> getFieldsByKey(String key) {
+        Map<LocalDateTime, Entry.Field> result = new HashMap<>();
+
+        // Iterate through all entries
+        for (Entry entry : entries) {
+            for (Entry.Field field : entry.getFields()) {
+                // Check whether a field with a given key exists
+                if (field.getKey().equals(key)) {
+                    result.put(entry.getDate(), field);
+                }
+            }
+        }
+
+        return result;
     }
 
     private List<Entry> parseEntries(JSONObject jsonObject) throws JSONException {
