@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -20,14 +21,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class DataView extends HBox {
     private final JsonHolder jsonHolder;
     private String xAxisKey;
-    private String yAxisKey;
     private ChartType chartType = ChartType.LineChart;
     private boolean hasChart = false;
 
@@ -35,26 +33,36 @@ public class DataView extends HBox {
     private static final LocalDateTime EPOCH_START = LocalDateTime.parse("1970-01-01T00:00:00.0");
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE;
 
+
+    //UI Components
     private ChoiceBox<String> xChoiceBox;
-    private ChoiceBox<String> yChoiceBox;
+    private final Map<ChoiceBox<String>, String> yChoiceBoxKeyMap;
+    private final VBox yAxisBox;
+    private final VBox xAxisBox;
 
     public DataView(JsonHolder jsonHolder) {
         this.getStylesheets().add(StatTrackApplication.MAIN_STYLESHEET);
         this.jsonHolder = jsonHolder;
 
+        yChoiceBoxKeyMap = new HashMap<>();
+        xAxisBox = new VBox();
+        yAxisBox = new VBox();
+
         initialize();
     }
 
     private void initialize() {
-
+        //General Design
         this.setPadding(new Insets(10));
 
         Label title = new Label("Setup");
         title.getStyleClass().add("h1");
 
+        //Setup of the menu box
         VBox menuHolder = new VBox();
         menuHolder.setSpacing(20);
 
+        //Choose a chart type, calls initChoiceBoxes();
         VBox chartTypeBox = new VBox();
         chartTypeBox.setSpacing(5);
         Label chartTypeLabel = new Label("Chart type");
@@ -62,74 +70,108 @@ public class DataView extends HBox {
         chartTypeChoiceBox.setValue(chartType);
         chartTypeChoiceBox.setOnAction(e -> {
             chartType = chartTypeChoiceBox.getValue();
-            updateChoiceBoxes();
+            initChoiceBoxes();
         });
         chartTypeBox.getChildren().addAll(chartTypeLabel, chartTypeChoiceBox);
 
-        VBox xAxisBox = new VBox();
+        //The xAxisBox and yAxis box hold all configuration UI elements to edit these
         xAxisBox.setSpacing(5);
+        yAxisBox.setSpacing(5);
+
         Label xAxisLabel = new Label("x-Axis");
+        xAxisBox.getChildren().add(xAxisLabel);
+
+        Label yAxisLabel = new Label("y-Axis");
+        yAxisBox.getChildren().add(yAxisLabel);
+
+
+        initChoiceBoxes();
+
+        menuHolder.getChildren().addAll(title, chartTypeBox, xAxisBox, yAxisBox);
+
+
+        this.getChildren().add(0, menuHolder);
+    }
+
+    //initChoiceBoxes sets up one choice box per axis
+    private void initChoiceBoxes() {
+
+        //Remove all x choice boxes, skip label
+        while (xAxisBox.getChildren().size() > 1) {
+            xAxisBox.getChildren().remove(xAxisBox.getChildren().size() - 1);
+        }
+
         xChoiceBox = new ChoiceBox<>();
         xChoiceBox.setOnAction(event -> {
             xAxisKey = xChoiceBox.getValue();
             updateChart();
         });
-        xAxisBox.getChildren().addAll(xAxisLabel, xChoiceBox);
+        xAxisBox.getChildren().add(xChoiceBox);
 
 
-        VBox yAxisBox = new VBox();
-        yAxisBox.setSpacing(5);
-        Label yAxisLabel = new Label("y-Axis");
-        yChoiceBox = new ChoiceBox<>();
-        yChoiceBox.setOnAction(event -> {
-            yAxisKey = yChoiceBox.getValue();
+        //Remove all y choice boxes, skip label
+        while (yAxisBox.getChildren().size() > 1) {
+            yAxisBox.getChildren().remove(yAxisBox.getChildren().size() - 1);
+        }
+
+        //Remove all y choice boxes from the map
+        for (ChoiceBox<String> stringChoiceBox : yChoiceBoxKeyMap.keySet()) {
+            yChoiceBoxKeyMap.remove(stringChoiceBox);
+        }
+
+        ChoiceBox<String> firstYBox = new ChoiceBox<>();
+        yChoiceBoxKeyMap.put(firstYBox, "");
+        firstYBox.setOnAction(event -> {
+            yChoiceBoxKeyMap.put(firstYBox, firstYBox.getValue());
             updateChart();
         });
-        yAxisBox.getChildren().addAll(yAxisLabel, yChoiceBox);
+        yAxisBox.getChildren().add(firstYBox);
 
-        updateChoiceBoxes();
-
-
-        menuHolder.getChildren().addAll(title, chartTypeBox, xAxisBox, yAxisBox);
-
-        this.getChildren().add(0, menuHolder);
-    }
-
-    private void updateChoiceBoxes() {
-        //Remove all items
         xChoiceBox.getItems().removeIf(item -> true);
-        yChoiceBox.getItems().removeIf(item -> true);
 
-        xChoiceBox.setDisable(false);
-        yChoiceBox.setDisable(false);
-
+        //Populate the choice boxes based on the line chart type and add special options
         switch (chartType) {
             case LineChart -> {
                 xChoiceBox.getItems().addAll(jsonHolder.getUniqueKeys(e -> e.getDataType() == DataType.NUMBER));
                 xChoiceBox.getItems().add(0, DATE);
-                yChoiceBox.getItems().addAll(jsonHolder.getUniqueKeys(e -> e.getDataType() == DataType.NUMBER));
-                yChoiceBox.getItems().add(0, DATE);
+                for (ChoiceBox<String> yChoiceBox : yChoiceBoxKeyMap.keySet()) {
+                    yChoiceBox.getItems().addAll(jsonHolder.getUniqueKeys(e -> e.getDataType() == DataType.NUMBER));
+                }
 
+                //Button to append new y-axis choice boxes
+                Button addYChoiceBox = new Button("Add field");
+                addYChoiceBox.setOnAction(e -> {
+                    int index = yAxisBox.getChildren().size() - 1; // Put the new choice box in front of the button
+                    ChoiceBox<String> temp = new ChoiceBox<>();
+                    temp.getItems().addAll(jsonHolder.getUniqueKeys(field -> field.getDataType() == DataType.NUMBER));
+                    yChoiceBoxKeyMap.put(temp, "");
+                    temp.setOnAction(event -> {
+                        yChoiceBoxKeyMap.put(temp, temp.getValue());
+                        updateChart();
+                    });
+                    yAxisBox.getChildren().add(index, temp);
+                });
+                yAxisBox.getChildren().add(addYChoiceBox);
             }
-            case BarChart -> {
-                xChoiceBox.getItems().addAll(jsonHolder.getUniqueKeys(e -> e.getDataType() == DataType.STRING || e.getDataType() == DataType.BOOLEAN));
-                yChoiceBox.setDisable(true);
-            }
+            case BarChart -> xChoiceBox.getItems().addAll(jsonHolder.getUniqueKeys(e -> e.getDataType() == DataType.STRING || e.getDataType() == DataType.BOOLEAN));
         }
 
+        //Select the first values
         if (xChoiceBox.getItems().size() > 0) {
             xChoiceBox.setValue(xChoiceBox.getItems().get(0));
         }
 
-        if (yChoiceBox.getItems().size() > 0) {
-            yChoiceBox.setValue(yChoiceBox.getItems().get(0));
+        for (ChoiceBox<String> yChoiceBox : yChoiceBoxKeyMap.keySet()) {
+            if (yChoiceBox.getItems().size() > 0) {
+                yChoiceBox.setValue(yChoiceBox.getItems().get(0));
+            }
         }
     }
 
     private void updateChart() {
-        if (xAxisKey != null && !xAxisKey.isEmpty() && yAxisKey != null && !yAxisKey.isEmpty()) {
+        if (xAxisKey != null && !xAxisKey.isEmpty()) {
             if (hasChart) {
-                // Remove the last object
+                // Remove the last object (the chart)
                 this.getChildren().remove(this.getChildren().size() - 1);
             }
             switch (chartType) {
@@ -153,26 +195,29 @@ public class DataView extends HBox {
 
         xAxis.setLabel(xAxisKey);
 
-        // Handle dates
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        series.setName(yAxisKey);
-
-        List<Number> xAxisData = new ArrayList<>();
-        List<Number> yAxisData = new ArrayList<>();
-
-        getData(xAxisData, xAxisKey, xAxis);
-        getData(yAxisData, yAxisKey, yAxis);
-
-        for (int i = 0; i < xAxisData.size() && i < yAxisData.size(); i++) {
-            if (xAxisData.get(i) == null || yAxisData.get(i) == null) {
-                continue;
-            }
-            series.getData().add(new XYChart.Data<>(xAxisData.get(i), yAxisData.get(i)));
-        }
-
         LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
-        lineChart.getData().add(series);
 
+        for (String yAxisKey : yChoiceBoxKeyMap.values()) {
+
+            // Handle dates
+            XYChart.Series<Number, Number> series = new XYChart.Series<>();
+            series.setName(yAxisKey);
+
+            List<Number> xAxisData = new ArrayList<>();
+            List<Number> yAxisData = new ArrayList<>();
+
+            getData(xAxisData, xAxisKey, xAxis);
+            getData(yAxisData, yAxisKey, yAxis);
+
+            for (int i = 0; i < xAxisData.size() && i < yAxisData.size(); i++) {
+                if (xAxisData.get(i) == null || yAxisData.get(i) == null) {
+                    continue;
+                }
+                series.getData().add(new XYChart.Data<>(xAxisData.get(i), yAxisData.get(i)));
+            }
+
+            lineChart.getData().add(series);
+        }
         return lineChart;
     }
 
