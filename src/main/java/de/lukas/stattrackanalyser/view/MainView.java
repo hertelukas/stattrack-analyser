@@ -7,6 +7,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 
 public class MainView extends BorderPane {
     private final MainViewModel mainViewModel;
@@ -44,10 +46,22 @@ public class MainView extends BorderPane {
             }
         });
 
+        MenuItem exportAsCSV = new MenuItem("_Export as CSV");
+        exportAsCSV.setOnAction(e -> {
+            try {
+                mainViewModel.exportAsCSV();
+            } catch (IOException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Couldn't export file.");
+                alert.showAndWait();
+                System.out.println("Failed to save file: " + ex);
+            }
+        });
+        exportAsCSV.disableProperty().bind(mainViewModel.holdsJson().not());
+
         MenuItem exit = new MenuItem("E_xit");
         exit.setOnAction(event -> mainViewModel.exit());
 
-        menuFile.getItems().addAll(loadFile, new SeparatorMenuItem(), exit);
+        menuFile.getItems().addAll(loadFile, exportAsCSV, new SeparatorMenuItem(), exit);
 
         menuBar.getMenus().add(menuFile);
 

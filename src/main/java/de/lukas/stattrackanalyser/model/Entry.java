@@ -45,7 +45,7 @@ public class Entry {
         return result;
     }
 
-    public static class Field {
+    public abstract static class Field {
         private final DataType dataType;
         private final String key;
 
@@ -61,6 +61,8 @@ public class Entry {
         public String getKey() {
             return key;
         }
+
+        public abstract String getValueAsString();
     }
 
     public static class TextField extends Field {
@@ -73,6 +75,11 @@ public class Entry {
 
         public String getValue() {
             return value;
+        }
+
+        @Override
+        public String getValueAsString() {
+            return getValue();
         }
     }
 
@@ -87,6 +94,11 @@ public class Entry {
         public boolean getValue() {
             return value;
         }
+
+        @Override
+        public String getValueAsString() {
+            return String.valueOf(getValue());
+        }
     }
 
     public static class NumberField extends Field {
@@ -99,6 +111,11 @@ public class Entry {
 
         public Number getValue() {
             return value;
+        }
+
+        @Override
+        public String getValueAsString() {
+            return String.valueOf(getValue());
         }
     }
 

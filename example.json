@@ -47,7 +47,7 @@
         "Effectiveness": 9.0,
         "Squats": 50,
         "Push-ups": 30,
-        "Comment": "Pause was worth it"
+        "Comment": "\"Pause\" was worth it"
       }
     },
     {
@@ -58,6 +58,17 @@
         "Squats": 42,
         "Push-ups": 32,
         "Comment": "No strength in the legs today"
+      }
+    },
+    {
+      "date": "2021-09-27T18:05:48.516354",
+      "fields": {
+        "Warmup": true,
+        "Effectiveness": 7.0,
+        "Squats": 40,
+        "Push-ups": 32,
+        "Sleep": 8,
+        "Comment": "I think I should track my sleep"
       }
     }
   ]

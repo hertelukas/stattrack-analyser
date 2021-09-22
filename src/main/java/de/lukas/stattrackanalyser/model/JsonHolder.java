@@ -127,6 +127,66 @@ public class JsonHolder {
         return result;
     }
 
+    public String getAsCSV() {
+        StringBuilder builder = new StringBuilder();
+        List<String> keys = new ArrayList<>();
+        //Generate top row
+        builder.append("Date");
+        for (String uniqueKey : getUniqueKeys()) {
+            keys.add(uniqueKey);
+            if (uniqueKey.contains(",") || uniqueKey.contains("\"") || uniqueKey.contains(" ")) {
+                builder.append("\"").append(uniqueKey.replace("\"", "\"\"")).append("\",");
+            } else {
+                builder.append(",").append(uniqueKey);
+            }
+        }
+        builder.append("\n");
+        //Fill in content
+        for (Entry entry : entries) {
+            builder.append(entry.getDate()).append(",");
+
+            List<Entry.Field> fields = entry.getFields();
+
+            for (int i = 0; i < keys.size() - 1; i++) {
+                boolean hasMatch = false;
+                for (Entry.Field field : fields) {
+                    if (field.getKey().equals(keys.get(i))) {
+                        hasMatch = true;
+                        if (field.getValueAsString().contains(",") || field.getValueAsString().contains("\"") || field.getValueAsString().contains(" ")) {
+                            builder.append("\"").append(field.getValueAsString().replace("\"", "\"\"")).append("\",");
+                        } else {
+                            builder.append(field.getValueAsString()).append(",");
+                        }
+                    }
+                }
+                if (!hasMatch) {
+                    builder.append("\"\",");
+                }
+            }
+
+            //Add the last one without comma
+            boolean hasMatch = false;
+
+            for (Entry.Field field : fields) {
+                if (field.getKey().equals(keys.get(keys.size() - 1))) {
+                    hasMatch = true;
+                    if (field.getValueAsString().contains(",") || field.getValueAsString().contains("\"")) {
+                        builder.append("\"\"").append(field.getValueAsString()).append("\"\"");
+                    } else {
+                        builder.append(field.getValueAsString());
+                    }
+                }
+            }
+            if (!hasMatch) {
+                builder.append("\"\"");
+            }
+
+            builder.append("\n");
+        }
+
+        return builder.toString();
+    }
+
     private List<Entry> parseEntries(JSONObject jsonObject) throws JSONException {
         List<Entry> result = new ArrayList<>();
         JSONArray document;
