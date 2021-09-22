@@ -35,7 +35,10 @@ public class MainView extends BorderPane {
                     Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to read JSON.");
                     alert.showAndWait();
                 }
-                case SUCCESS -> this.setBottom(new BottomStatsView(mainViewModel.getJsonHolder()));
+                case SUCCESS -> {
+                    this.setBottom(new BottomStatsView(mainViewModel.getJsonHolder()));
+                    this.setCenter(new DataView(mainViewModel.getJsonHolder()));
+                }
             }
         });
 

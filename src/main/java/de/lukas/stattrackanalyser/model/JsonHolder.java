@@ -36,7 +36,66 @@ public class JsonHolder {
         return entries.size();
     }
 
-    public Map<LocalDateTime, Entry.Field> getFieldsByPredicate(Predicate<Entry.Field> predicate) {
+    public DataType getDataType(String key) {
+        for (Entry entry : entries) {
+            for (Entry.Field field : entry.getFields()) {
+                if (key.equals(field.getKey())) {
+                    return field.getDataType();
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<String> getUniqueKeys() {
+        List<String> result = new ArrayList<>();
+
+        for (Entry entry : entries) {
+            for (String uniqueKey : entry.uniqueKeys()) {
+                if (!result.contains(uniqueKey)) {
+                    result.add(uniqueKey);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<String> getUniqueKeys(Predicate<Entry.Field> predicate) {
+        List<String> result = new ArrayList<>();
+
+        for (Entry entry : entries) {
+            for (Entry.Field field : entry.getFields()) {
+                if (!result.contains(field.getKey()) && predicate.test(field)) {
+                    result.add(field.getKey());
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<Entry.Field> getFields(String key, DataType type) {
+        List<Entry.Field> result = new ArrayList<>();
+
+        for (Entry entry : entries) {
+            result.add(entry.getFirst(key, type));
+        }
+
+        return result;
+    }
+
+    public List<LocalDateTime> getDates() {
+        List<LocalDateTime> result = new ArrayList<>();
+
+        for (Entry entry : entries) {
+            result.add(entry.getDate());
+        }
+
+        return result;
+    }
+
+    public Map<LocalDateTime, Entry.Field> getDateFields(Predicate<Entry.Field> predicate) {
         Map<LocalDateTime, Entry.Field> result = new HashMap<>();
 
         // Iterate through all entries
@@ -52,7 +111,7 @@ public class JsonHolder {
         return result;
     }
 
-    public Map<LocalDateTime, Entry.Field> getFieldsByKey(String key) {
+    public Map<LocalDateTime, Entry.Field> getDateFields(String key) {
         Map<LocalDateTime, Entry.Field> result = new HashMap<>();
 
         // Iterate through all entries

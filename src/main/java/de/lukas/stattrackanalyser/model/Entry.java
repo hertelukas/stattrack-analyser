@@ -1,6 +1,7 @@
 package de.lukas.stattrackanalyser.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +22,27 @@ public class Entry {
 
     public List<Field> getFields() {
         return fields;
+    }
+
+    public Field getFirst(String key, DataType type) {
+        for (Field field : fields) {
+            if (key.equals(field.getKey()) && type == field.getDataType()) {
+                return field;
+            }
+        }
+        return null;
+    }
+
+    public List<String> uniqueKeys() {
+        List<String> result = new ArrayList<>();
+
+        for (Field field : fields) {
+            if (!result.contains(field.getKey())) {
+                result.add(field.getKey());
+            }
+        }
+
+        return result;
     }
 
     public static class Field {
