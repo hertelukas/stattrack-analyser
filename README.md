@@ -1,2 +1,2 @@
 # Stat Track Analyser
-Analyse your Stat Track data
+Analyse your <a href="https://github.com/hertelukas/stattrack">Stat Track</a> data.
