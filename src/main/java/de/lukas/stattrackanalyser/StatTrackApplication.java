@@ -27,7 +27,7 @@ public class StatTrackApplication extends Application {
         Font.loadFont(getClass().getResourceAsStream("/fonts/static/Raleway-Bold.ttf"), 16);
     }
 
-    public static void main(String[] args) {
-        launch();
+    public static void startApp(String[] args){
+        launch(args);
     }
 }
